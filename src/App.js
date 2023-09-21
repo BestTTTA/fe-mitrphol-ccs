@@ -13,12 +13,12 @@ import axios from "axios";
 
 function BasicExample() {
 
-  const URL = process.env.URL;
+  // const URL = process.env.URL;
 
   const sendData = async () => {
     try {
       const response = await axios.post(
-        `${URL}/predict`,
+        "https://apimitphol.thetigerteamacademy.net/predict/",
         {
           "BrixF": Number(brixF),
           "Fiber": Number(fiber)
