@@ -1,0 +1,16 @@
+version: '3'
+services:
+  webapp:
+    image: mitrprediction:v1.2
+    ports:
+      - "80:80"
+    networks:
+      - ccs-api
+
+  mitrphol-api:
+    image: ccs:v1.1
+    networks:
+      - ccs-api
+
+networks:
+  ccs-api:
