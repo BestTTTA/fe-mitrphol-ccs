@@ -38,19 +38,28 @@ body {
 input {
   border-radius: 5px;
 }
+.containbutton{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: end;
+
+}
 
 .button{
   display: flex;
   flex-direction: row;
-  align-self: end;
+  justify-content: center;
   gap: 10px;
 }
 
-.text {
+text {
    margin: 10px;
+   font-size: small;
+   font-weight: bold;
 }
 
-.valueconatin {
+.valuecontain {
   display: flex;
   flex-direction: column;
   align-items: center;
