@@ -33,7 +33,6 @@ function Listdata() {
     <div style={{ color: "black", padding: "20px" }}>
       {dataList.map((item, index) => (
         <div key={index}>
-          {/* แสดงข้อมูลต่างๆที่คุณต้องการจาก dataList ตรงนี้ */}
           <p>เวลาPredict: {item.Timestamp}</p>
           <p>Brix(F): {item.BrixF}</p>
           <p>ระบุเดือน: {item.XValue}</p>

@@ -9,10 +9,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { DateTime } from "luxon";
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
-import { Link } from "react-router-dom";
 import "../App.css";
 import logo from "../image 2.png";
-import Scrip from "../script.png";
 
 function Home() {
   // const [api, setApi] = React.useState("httpss://apimitphol.thetigerteamacademy.net/predict/");
