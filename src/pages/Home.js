@@ -120,7 +120,7 @@ function Home() {
               value={FiberFunc}
               onChange={handlefiberChange}
             >
-              {["T1", "T2", "T3", "T4", "T5", "T6"].map((T) => (
+              {["600", "800", "1.000", "1.200", "1.400", "1.600"].map((T) => (
                 <MenuItem key={T} value={T}>
                   {T}
                 </MenuItem>
@@ -138,7 +138,7 @@ function Home() {
               onChange={handleModelChange}
             >
               <MenuItem value={Overall}>Overall</MenuItem>
-              {["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9"].map(
+              {["มิตรภูเขียว", "มิตรกาฬสินธุ์", "มิตรภูเวียง", "มิตรภูหลวง", "มิตรอำนาจเจริญ", "มิตรผล ด่านช้าง", "มิตรผล สิงห์บุนรี", "มิตรผล เกษตรสมบรูณ์" ].map(
                 (F) => (
                   <MenuItem key={F} value={F}>
                     {F}
