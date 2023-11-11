@@ -14,7 +14,6 @@ import axios from "axios";
 import PyScript from "pyscript-react/esm"; // main entrypoint
 import PyScriptProvider from "pyscript-react/esm/components/py-script-provider";
 
-
 function MapCenterUpdater({ center }) {
   const map = useMap();
   useEffect(() => {
@@ -48,6 +47,16 @@ export default function Map({ CCS }) {
   const [ccs, setCcs] = useState([]);
   const [latitude, setLatitude] = useState([]);
   const [longitude, setLongitude] = useState([]);
+  const [mapKey, setMapKey] = useState(Date.now());
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     // ทำการรีเฟรช key ของแผนที่เพื่อโหลดข้อมูลใหม่
+  //     setMapKey(Date.now());
+  //   }, 60000); // ตั้งค่าเวลาในการรีเฟรช (เช่นทุก 60 วินาที)
+
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const sendDataSheeet = async () => {
     try {
@@ -57,7 +66,7 @@ export default function Map({ CCS }) {
         longitude: Number(longitude),
       };
 
-      const response = await axios.post("http://127.0.0.1:8000/log/", data);
+      const response = await axios.post("https://apilatlng.thetigerteamacademy.net/log/", data);
       if (response.data.result === "success") {
         console.log("Data sent successfully");
       } else {
@@ -71,7 +80,7 @@ export default function Map({ CCS }) {
   useEffect(() => {
     // พยายามดึงข้อมูลจาก API ที่สร้างด้วย FastAPI
     axios
-      .get("http://127.0.0.1:8000/get_data/")
+      .get("https://apilatlng.thetigerteamacademy.net/get_data/")
       .then((response) => {
         setDataList(response.data);
       })
@@ -102,6 +111,7 @@ export default function Map({ CCS }) {
         // setLongitude(position.coords.longitude);
         if (CCS) {
           sendDataSheeet();
+          setMapKey(Date.now());
         } else {
           alert("PredictCCS before Update location");
         }
@@ -144,10 +154,10 @@ export default function Map({ CCS }) {
           <img src={Icon} style={{ width: "25px" }}></img>
         </div>
         <p>
-          {lat} location {lng}
+          latitude:{lat} longitude:{lng}
         </p>
       </div>
-      <MapContainer
+      {/* <MapContainer
         center={[lat, lng]}
         zoom={20}
         style={{ height: "60vh", width: "60vw" }}
@@ -166,7 +176,12 @@ export default function Map({ CCS }) {
             />
           ))}
         </LayersControl>
-      </MapContainer>
+      </MapContainer> */}
+      <iframe
+        src={`https://mapflask.thetigerteamacademy.net?${mapKey}`}
+        style={{ height: "60vh", width: "70vw" }}
+        title="Map"
+      ></iframe>
     </div>
   );
 }
