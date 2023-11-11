@@ -11,6 +11,9 @@ import "leaflet/dist/leaflet.css";
 import "../App.css";
 import Icon from "../location-pin.png";
 import axios from "axios";
+import PyScript from "pyscript-react/esm"; // main entrypoint
+import PyScriptProvider from "pyscript-react/esm/components/py-script-provider";
+
 
 function MapCenterUpdater({ center }) {
   const map = useMap();
@@ -54,7 +57,7 @@ export default function Map({ CCS }) {
         longitude: Number(longitude),
       };
 
-      const response = await axios.post("https://apilatlng.thetigerteamacademy.net/log/", data);
+      const response = await axios.post("http://127.0.0.1:8000/log/", data);
       if (response.data.result === "success") {
         console.log("Data sent successfully");
       } else {
@@ -68,7 +71,7 @@ export default function Map({ CCS }) {
   useEffect(() => {
     // พยายามดึงข้อมูลจาก API ที่สร้างด้วย FastAPI
     axios
-      .get("https://apilatlng.thetigerteamacademy.net/get_data/")
+      .get("http://127.0.0.1:8000/get_data/")
       .then((response) => {
         setDataList(response.data);
       })
