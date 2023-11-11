@@ -1,6 +1,8 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Listdata from './pages/Listdata';
+import Map from './pages/Map'
+
 
 function App() {
   return (
