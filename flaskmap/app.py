@@ -17,7 +17,7 @@ def update_map():
         latest_data = data[0]
 
         # สร้างแผนที่ด้วยตำแหน่งล่าสุด
-        m = Map(location=[latest_data['latitude'], latest_data['longitude']], zoom_start=13)
+        m = Map(location=[15.971240509494967, 102.62708789618164], zoom_start=7)
 
         # สร้างข้อมูลสำหรับ heatmap
         heatmap_data = [[item['latitude'], item['longitude'], item['ccs']] for item in data]
@@ -29,7 +29,7 @@ def update_map():
         m.save('map.html')
 
         # รอเวลาก่อนการอัปเดตถัดไป
-        time.sleep(5)
+        time.sleep(1)
 
 @app.route('/')
 def serve_map():
@@ -37,4 +37,4 @@ def serve_map():
 
 if __name__ == '__main__':
     threading.Thread(target=update_map).start()
-    app.run(host='0.0.0.0', port=6666)
+    app.run(host='0.0.0.0', port=3030)

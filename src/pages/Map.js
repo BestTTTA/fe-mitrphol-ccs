@@ -48,6 +48,15 @@ export default function Map({ CCS }) {
   const [latitude, setLatitude] = useState([]);
   const [longitude, setLongitude] = useState([]);
   const [mapKey, setMapKey] = useState(Date.now());
+  const [clicked, setClicked] = useState(false);
+
+  const style = {
+    textDecoration: "underline",
+    cursor: "pointer",
+    color: clicked ? "gray" : "black", // สีเปลี่ยนเมื่อคลิก
+    transform: clicked ? "scale(1)" : "scale(1)", // เพิ่มขนาดเมื่อคลิก
+    transition: "transform 0.2s, color 0.2s", // การเปลี่ยนแปลงอย่างเรียบร้อย
+  };
 
   // useEffect(() => {
   //   const interval = setInterval(() => {
@@ -66,7 +75,10 @@ export default function Map({ CCS }) {
         longitude: Number(longitude),
       };
 
-      const response = await axios.post("https://apilatlng.thetigerteamacademy.net/log/", data);
+      const response = await axios.post(
+        "https://apilatlng.thetigerteamacademy.net/log/",
+        data
+      );
       if (response.data.result === "success") {
         console.log("Data sent successfully");
       } else {
@@ -107,11 +119,12 @@ export default function Map({ CCS }) {
       (position) => {
         setLat(position.coords.latitude);
         setLng(position.coords.longitude);
-        // setLatitude(position.coords.latitude);
-        // setLongitude(position.coords.longitude);
+        setClicked(!clicked);
         if (CCS) {
           sendDataSheeet();
           setMapKey(Date.now());
+          alert("ดำเนินการเสร็จสิ้น");
+          
         } else {
           alert("PredictCCS before Update location");
         }
@@ -123,32 +136,24 @@ export default function Map({ CCS }) {
     );
   };
   // ตัวอย่างข้อมูล CCS
-  const ccsData = [
-    { lat: lat, lng: lng, ccs: CCS },
-    // ... other data ...
-  ];
+  // const ccsData = [
+  //   { lat: lat, lng: lng, ccs: CCS },
+  //   // ... other data ...
+  // ];
 
-  const transformedData = dataList.map((item) => ({
-    lat: item.latitude,
-    lng: item.longitude,
-    ccs: item.ccs,
-  }));
+  // const transformedData = dataList.map((item) => ({
+  //   lat: item.latitude,
+  //   lng: item.longitude,
+  //   ccs: item.ccs,
+  // }));
 
-  const getColorForCCS = (ccsValue) => {
-    if (ccsValue > 10) return "red";
-    if (ccsValue > 5) return "orange";
-    if (ccsValue > 3) return "yellow";
-    return 0;
-  };
+
 
   return (
     <div className="map">
       <div>
         <div className="getlocation">
-          <a
-            onClick={getCurrentLocation}
-            style={{ textDecoration: "underline" }}
-          >
+          <a onClick={getCurrentLocation} style={style}>
             <b>Get location</b>
           </a>
           <img src={Icon} style={{ width: "25px" }}></img>
@@ -157,28 +162,8 @@ export default function Map({ CCS }) {
           latitude:{lat} longitude:{lng}
         </p>
       </div>
-      {/* <MapContainer
-        center={[lat, lng]}
-        zoom={20}
-        style={{ height: "60vh", width: "60vw" }}
-      >
-        <ZoomListener setCircleRadius={setCircleRadius} />
-        <MapCenterUpdater center={[lat, lng]} />
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <LayersControl position="topright">
-          {transformedData.map((data, index) => (
-            <Circle
-              key={index}
-              center={[data.lat, data.lng]}
-              fillColor={getColorForCCS(data.ccs)}
-              radius={circleRadius}
-              pathOptions={{ color: getColorForCCS(data.ccs) }}
-            />
-          ))}
-        </LayersControl>
-      </MapContainer> */}
       <iframe
-        src={`https://mapflask.thetigerteamacademy.net?${mapKey}`}
+        src={`https://mapccs.thetigerteamacademy.net/`}
         style={{ height: "60vh", width: "70vw" }}
         title="Map"
       ></iframe>

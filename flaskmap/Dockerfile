@@ -7,7 +7,7 @@ RUN pip install flask folium requests
 COPY . .
 
 # Expose the port Flask is running on
-EXPOSE 6666
+EXPOSE 3030
 
 # Run the Python script
 CMD ["python", "app.py"]
