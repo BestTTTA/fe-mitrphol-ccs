@@ -7,7 +7,8 @@ function Listdata() {
   useEffect(() => {
     // พยายามดึงข้อมูลจาก API ที่สร้างด้วย FastAPI
     axios
-      .get("https://ccs.api.thetigerteamacademy.net/get_data")
+      // .get("https://ccs.api.thetigerteamacademy.net/get_data")
+      .get("http://127.0.0.1:8000/get_data")
       .then((response) => {
         setDataList(response.data);
       })

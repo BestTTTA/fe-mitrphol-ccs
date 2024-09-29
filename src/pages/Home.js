@@ -7,36 +7,33 @@ import TextField from "@mui/material/TextField";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { DateTime } from "luxon";
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Button from "react-bootstrap/Button";
 import "../App.css";
 import logo from "../image 2.png";
-import Map from "./Map";
-import { Link } from "react-router-dom";
-import Scrip from "../script.png";
 
 function Home() {
-  // const [api, setApi] = React.useState("httpss://apimitphol.thetigerteamacademy.net/predict/");
-  // const [api, setApi] = React.useState("http://127.0.0.1:8000/predict/");
   const [FiberFunc, setFiberFunc] = useState("");
   const [XValue, setXValue] = useState("");
   const [ModelName, setModelName] = useState("");
-  const [brixF, setBrixF] = React.useState("");
-  const [result, setResult] = React.useState(null);
+  const [brixF, setBrixF] = useState("");
+  const [result, setResult] = useState(null);
   const [selectedValue, setSelectedValue] = useState("");
   const [selectedValueM, setSelectedValueM] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSelect = (value) => {
     const transformedValue = transformValue(value);
     setSelectedValue(transformedValue);
   };
+
   const handleSelectM = (value) => {
     const transformedValueM = transformValueM(value);
     setSelectedValueM(transformedValueM);
   };
 
   const transformValue = (value) => {
-    switch(value) {
+    switch (value) {
       case "600":
         return "T1";
       case "800":
@@ -50,11 +47,12 @@ function Home() {
       case "1,600":
         return "T6";
       default:
-        return value; // คืนค่าเดิมหากไม่ตรงเงื่อนไขใดๆ
+        return value;
     }
   };
+
   const transformValueM = (value) => {
-    switch(value) {
+    switch (value) {
       case "Overall":
         return "finalized";
       case "มิตรภูเขียว":
@@ -74,23 +72,24 @@ function Home() {
       case "มิตรผล เกษตรสมบรูณ์":
         return "M8";
       default:
-        return value; 
+        return value;
     }
   };
-  const Overall = "finalized";
 
   const handleMonthChange = (event) => {
     setXValue(event.target.value);
   };
+  
   const handlefiberChange = (event) => {
     setFiberFunc(event.target.value);
   };
+
   const handleModelChange = (event) => {
     setModelName(event.target.value);
   };
 
-
   const sendData = async () => {
+    setIsLoading(true);
     try {
       const data = {
         BrixF: Number(brixF),
@@ -98,25 +97,18 @@ function Home() {
         XValue: Number(XValue),
         ModelName: String(selectedValueM),
       };
-      const response = await axios.post(
-        "https://ccs.api.thetigerteamacademy.net/predict/",
-        data
-      );
+      const response = await axios.post("https://apimitphol.ccs.thetigerteamacademy.net/predict/", data);
       setResult(response.data);
     } catch (error) {
       console.error("There was an error sending the data:", error);
-      console.error("Error:", error.response.data);
+    } finally {
+      setIsLoading(false); 
     }
   };
 
-  React.useEffect(() => {
-    if (result) {
-      sendDataSheeet();
-    }
-  }, [result]);
-
   const thaiTimestamp = DateTime.now().setZone("Asia/Bangkok").toISO();
-  const sendDataSheeet = async () => {
+
+  const sendDataSheeet = useCallback(async () => {
     try {
       const data = {
         Timestamp: thaiTimestamp,
@@ -127,10 +119,7 @@ function Home() {
         PredictCCS: Number(result),
       };
 
-      const response = await axios.post(
-        "https://ccs.api.thetigerteamacademy.net/log/",
-        data
-      );
+      const response = await axios.post("https://apimitphol.ccs.thetigerteamacademy.net/log/", data);
       if (response.data.result === "success") {
         console.log("Data sent successfully");
       } else {
@@ -138,17 +127,21 @@ function Home() {
       }
     } catch (error) {
       console.error("There was an error sending the data:", error);
-      console.log(selectedValue)
-      console.log(selectedValueM)
     }
-  };
+  }, [thaiTimestamp, brixF, FiberFunc, XValue, selectedValueM, result]);
+
+  React.useEffect(() => {
+    if (result) {
+      sendDataSheeet();
+    }
+  }, [result, sendDataSheeet]);
 
   const clearValues = () => {
     setFiberFunc("");
     setXValue("");
     setModelName("");
     setBrixF("");
-    setResult("");
+    setResult(null);
   };
 
   return (
@@ -176,6 +169,7 @@ function Home() {
                 ))}
               </Select>
             </FormControl>
+
             <FormControl sx={{ m: 0, minWidth: "100%" }}>
               <FormHelperText>
                 <b>ระดับน้ำฝน</b>
@@ -193,6 +187,7 @@ function Home() {
                 ))}
               </Select>
             </FormControl>
+
             <FormControl sx={{ m: 0, minWidth: "100%" }}>
               <FormHelperText>
                 <b>ระบุโรงงาน</b>
@@ -203,7 +198,9 @@ function Home() {
                 value={ModelName}
                 onChange={handleModelChange}
               >
-                <MenuItem value="Overall" onClick={() => handleSelectM("Overall")}>Overall</MenuItem>
+                <MenuItem value="Overall" onClick={() => handleSelectM("Overall")}>
+                  Overall
+                </MenuItem>
                 {[
                   "มิตรภูเขียว",
                   "มิตรกาฬสินธุ์",
@@ -220,6 +217,7 @@ function Home() {
                 ))}
               </Select>
             </FormControl>
+
             <TextField
               value={brixF}
               onChange={(e) => setBrixF(e.target.value)}
@@ -228,43 +226,31 @@ function Home() {
               sx={{ m: 1, width: "100%" }}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">Brix(F) </InputAdornment>
+                  <InputAdornment position="start">Brix(F)</InputAdornment>
                 ),
               }}
             />
+
             <div className="text">
-              <text>
-                <div> {result ? "CCS is: " + result : "..."}</div>
-              </text>
+              <div>{result ? "CCS is: " + result : "..."}</div>
             </div>
+
             <div className="containbutton">
               <div className="button">
                 <Button
                   variant="primary"
                   onClick={sendData}
-                  disabled={[brixF, FiberFunc, XValue, ModelName].some(
-                    (value) => !value
-                  )}
+                  disabled={isLoading || [brixF, FiberFunc, XValue, ModelName].some((value) => !value)}
                 >
-                  PREDICT CCS
+                  {isLoading ? "Predicting..." : "PREDICT CCS"}
                 </Button>
                 <Button variant="secondary" onClick={clearValues}>
                   CLEAR
                 </Button>
-                <div className="list">
-                  {/* <Link to="/Listdata">
-                  <img
-                    src={Scrip}
-                    height="40px"
-                    style={{ cursor: "pointer" }}
-                  />
-                </Link> */}
-                </div>
               </div>
             </div>
           </div>
         </div>
-        <Map  CCS = {result} />
       </div>
     </main>
   );
