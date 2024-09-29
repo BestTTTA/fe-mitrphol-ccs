@@ -72,19 +72,11 @@ text {
 
 .mapcontain {
   display: flex;
-  flex-wrap: wrap;
+  /* flex-wrap: wrap; */
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 40px;
-}
-
-.map{
-  display: flex;
-  flex-direction: column;
-  width: auto;
-  height: auto;
-  overflow: hidden;
+  gap: 5px;
 }
 
 .getlocation {

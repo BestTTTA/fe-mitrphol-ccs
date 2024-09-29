@@ -11,6 +11,7 @@ import React, { useState, useCallback } from "react";
 import Button from "react-bootstrap/Button";
 import "../App.css";
 import logo from "../image 2.png";
+import MapComponent from "../components/Map";
 
 function Home() {
   const [FiberFunc, setFiberFunc] = useState("");
@@ -21,6 +22,46 @@ function Home() {
   const [selectedValue, setSelectedValue] = useState("");
   const [selectedValueM, setSelectedValueM] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+
+
+  const sentLatLon = async (lat, lon, ccs) => {
+    try {
+      const data = {
+        ccs: parseFloat(ccs),
+        lat: parseFloat(lat),
+        lon: parseFloat(lon),
+      };
+
+      const response = await axios.post("https://ccs.latlon.thetigerteamacademy.net/geo/", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error sending data:', error.response ? error.response.data : error.message);
+    }
+  };
+
+
+  const getUserLocation = (ccs) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          sentLatLon(latitude, longitude, ccs);
+        },
+        (error) => {
+          console.error('Error getting user location:', error);
+        }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+    }
+  };
+
 
   const handleSelect = (value) => {
     const transformedValue = transformValue(value);
@@ -79,7 +120,7 @@ function Home() {
   const handleMonthChange = (event) => {
     setXValue(event.target.value);
   };
-  
+
   const handlefiberChange = (event) => {
     setFiberFunc(event.target.value);
   };
@@ -99,10 +140,11 @@ function Home() {
       };
       const response = await axios.post("https://apimitphol.ccs.thetigerteamacademy.net/predict/", data);
       setResult(response.data);
+      getUserLocation(response.data)
     } catch (error) {
       console.error("There was an error sending the data:", error);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -149,7 +191,7 @@ function Home() {
       <div className="nav">
         <img src={logo} alt="logo" />
       </div>
-      <div className="mapcontain">
+      <div className="mapcontain p-4">
         <div className="valuecontain">
           <div className="addvalue">
             <FormControl sx={{ m: 0, minWidth: "100%" }}>
@@ -251,6 +293,7 @@ function Home() {
             </div>
           </div>
         </div>
+          <MapComponent />
       </div>
     </main>
   );
