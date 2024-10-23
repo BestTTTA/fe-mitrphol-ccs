@@ -273,7 +273,7 @@ function Home() {
             <p>Latitude: {lat}</p>
             <p>Longitude: {lon}</p>
             <p>Rainfall: {sumRain}</p>
-            <p>Selected: {month}</p>
+            <p>Month: {month}</p>
           </div>
           <FormControl sx={{ m: 0, minWidth: "100%" }}>
             <FormHelperText>
