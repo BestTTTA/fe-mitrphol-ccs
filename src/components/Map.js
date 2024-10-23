@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, HeatmapLayer } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, HeatmapLayer, Marker } from "@react-google-maps/api";
 import axios from "axios";
 
 const MapComponent = () => {
   const [locations, setLocations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPosition, setCurrentPosition] = useState(null);
   const mapCenter = {
     lat: 13.736717,
     lng: 100.523186
@@ -23,6 +24,20 @@ const MapComponent = () => {
     };
 
     fetchData();
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCurrentPosition({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error getting current position:", error);
+        }
+      );
+    }
   }, []);
 
   const mapStyles = {
@@ -43,7 +58,7 @@ const MapComponent = () => {
       <GoogleMap
         mapContainerStyle={mapStyles}
         zoom={5}
-        center={mapCenter}
+        center={currentPosition || mapCenter}
         mapTypeId="hybrid"
       >
         {!isLoading && locations.length > 0 && (
@@ -54,6 +69,12 @@ const MapComponent = () => {
               opacity: 0.6,
               dissipating: true,
             }}
+          />
+        )}
+        
+        {currentPosition && (
+          <Marker 
+            position={currentPosition} 
           />
         )}
       </GoogleMap>
