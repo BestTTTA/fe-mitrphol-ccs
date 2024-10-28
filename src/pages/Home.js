@@ -70,10 +70,15 @@ function Home() {
     }
   };
 
-  useEffect(() => {
+  const clickGetBoth = () => {
     getStartAndEndDate();
     getUserLocation();
-  }, []);
+  }
+
+  // useEffect(() => {
+  //   getStartAndEndDate();
+  //   getUserLocation();
+  // }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchNasaPowerData = useCallback(async () => {
@@ -105,14 +110,14 @@ function Home() {
     }
   }, [startDate, endDate, lat, lon, fetchNasaPowerData]);
 
-  // Function to select the appropriate value for T based on sumRain
+
   const selectTBasedOnRain = (rain) => {
-    if (rain < 600) return "T1";
-    if (rain < 800) return "T2";
-    if (rain < 1000) return "T3";
-    if (rain < 1200) return "T4";
-    if (rain < 1400) return "T5";
-    if (rain < 1600) return "T6";
+    if (rain <= 600) return "T1";
+    if (rain >= 600 && rain <= 800) return "T2";
+    if (rain >= 800 && rain <= 1000) return "T3";
+    if (rain >= 1000 && rain <= 1200) return "T4";
+    if (rain >= 1200 && rain <= 1400) return "T5";
+    if (rain >= 1400 && rain <= 1600) return "T6";
     return "T6";
   };
 
@@ -274,6 +279,9 @@ function Home() {
             <p>Longitude: {lon}</p>
             <p>Rainfall: {sumRain}</p>
             <p>Month: {month}</p>
+          </div>
+          <div className="mb-2">
+            <button onClick={clickGetBoth} className="underline hover:text-blue-500">Click here to get the location.</button>
           </div>
           <FormControl sx={{ m: 0, minWidth: "100%" }}>
             <FormHelperText>
