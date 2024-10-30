@@ -192,11 +192,9 @@ function Home() {
         XValue: Number(month),
         ModelName: String(selectedValueM),
       };
-      console.log("Data predict", data)
       const response = await axios.post("https://apimitphol.ccs.thetigerteamacademy.net/predict/", data);
       setResult(response.data);
       sentLatLon(response.data)
-      console.log("Response predict",response.data)
     } catch (error) {
       console.error("There was an error sending the data:", error);
     } finally {
