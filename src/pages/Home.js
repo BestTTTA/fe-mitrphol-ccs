@@ -17,7 +17,10 @@ function Home() {
   const [FiberFunc, setFiberFunc] = useState("");
   const [XValue, setXValue] = useState("");
   const [ModelName, setModelName] = useState("");
-  const [brixF, setBrixF] = useState("");
+  const [brixFLast, setBrixFLast] = useState(null);
+  const [brixFMiddle, setBrixFMiddle] = useState(null);
+  const [brixFBegin, setBrixFBegin] = useState(null);
+  const [brixFAvg, setBrixFAvg] = useState(null);
   const [result, setResult] = useState(null);
   const [selectedValue, setSelectedValue] = useState("");
   const [selectedValueM, setSelectedValueM] = useState("");
@@ -27,7 +30,7 @@ function Home() {
   const [lat, setLat] = useState("");
   const [lon, setLon] = useState("");
   const [sumRain, setSumRain] = useState(0);
-  const [month, setMonth] = useState(0);
+  const [month, setMonth] = useState(7);
 
   const getStartAndEndDate = () => {
     const today = new Date();
@@ -45,12 +48,8 @@ function Home() {
     const startDateFormatted = startDateString.replace(/-/g, "");
     const endDateFormatted = endDateString.replace(/-/g, "");
 
-    // Extract only the month (zero-indexed, so add 1 for human-readable month)
-    const month = today.getMonth() + 1;
-
     setStartDate(startDateFormatted);
     setEndDate(endDateFormatted);
-    setMonth(month); // Assuming you have a `setMonth` state setter
   };
 
   const getUserLocation = () => {
@@ -110,7 +109,6 @@ function Home() {
     }
   }, [startDate, endDate, lat, lon, fetchNasaPowerData]);
 
-
   const selectTBasedOnRain = (rain) => {
     if (rain <= 600) return "T1";
     if (rain >= 600 && rain <= 800) return "T2";
@@ -139,7 +137,7 @@ function Home() {
         return "มิตรผล ด่านช้าง";
       case "M7":
         return "มิตรผล สิงห์บุนรี";
-      case "M98":
+      case "M9":
         return "มิตรผล เกษตรสมบรูณ์";
       default:
         return model;
@@ -160,7 +158,6 @@ function Home() {
     setModelName(event.target.value);
   };
 
-  
   const transformValueM = (value) => {
     switch (value) {
       case "Overall":
@@ -190,14 +187,16 @@ function Home() {
     setIsLoading(true);
     try {
       const data = {
-        BrixF: Number(brixF),
+        BrixF: brixFAvg,
         FiberFunc: "fiber_" + String(selectedValue),
         XValue: Number(month),
         ModelName: String(selectedValueM),
       };
+      console.log("Data predict", data)
       const response = await axios.post("https://apimitphol.ccs.thetigerteamacademy.net/predict/", data);
       setResult(response.data);
       sentLatLon(response.data)
+      console.log("Response predict",response.data)
     } catch (error) {
       console.error("There was an error sending the data:", error);
     } finally {
@@ -205,9 +204,10 @@ function Home() {
     }
   };
 
+
   const thaiTimestamp = DateTime.now().setZone("Asia/Bangkok").toISO();
 
-
+  // month 7-12
   const sentLatLon = async (ccs) => {
     try {
       const data = {
@@ -217,7 +217,7 @@ function Home() {
         month: parseFloat(month),
         precipitation: parseFloat(sumRain),
         factory: selectedModel(selectedValueM),
-        brix: parseFloat(brixF),
+        brix: parseFloat(brixFAvg),
       };
 
       const response = await axios.post("https://ccs.latlon.thetigerteamacademy.net/geo/", data, {
@@ -236,7 +236,7 @@ function Home() {
     try {
       const data = {
         Timestamp: thaiTimestamp,
-        BrixF: Number(brixF),
+        BrixF: Number(brixFAvg),
         FiberFunc: String(FiberFunc),
         XValue: Number(XValue),
         ModelName: String(selectedValueM),
@@ -251,7 +251,7 @@ function Home() {
     } catch (error) {
       console.error("There was an error sending the data:", error);
     }
-  }, [thaiTimestamp, brixF, FiberFunc, XValue, selectedValueM, result]);
+  }, [thaiTimestamp, brixFAvg, FiberFunc, XValue, selectedValueM, result]);
 
   useEffect(() => {
     if (result) {
@@ -261,11 +261,21 @@ function Home() {
 
   const clearValues = () => {
     setFiberFunc("");
-    setXValue("");
+    setXValue(7);
     setModelName("");
-    setBrixF("");
-    setResult(null);
+    setBrixFLast("");
+    setBrixFMiddle("");
+    setBrixFBegin("");
+    setResult("");
   };
+
+  useEffect(() => {
+    if (brixFBegin !== null && brixFMiddle !== null && brixFLast !== null) {
+      const brixF = Number(brixFBegin) + Number(brixFMiddle) + Number(brixFLast);
+      const brixFAvg = brixF / 3;
+      setBrixFAvg(Number(brixFAvg));
+    }
+  }, [brixFBegin, brixFMiddle, brixFLast]);
 
   return (
     <main>
@@ -277,8 +287,7 @@ function Home() {
           <div className="flex w-full flex-col">
             <p>Latitude: {lat}</p>
             <p>Longitude: {lon}</p>
-            <p>Rainfall: {sumRain}</p>
-            <p>Month: {month}</p>
+            <p>Precipitation: {sumRain}</p>
           </div>
           <div className="mb-2">
             <button onClick={clickGetBoth} className="underline hover:text-blue-500">Click here to get the location.</button>
@@ -313,34 +322,83 @@ function Home() {
             </Select>
           </FormControl>
 
+          <FormControl sx={{ m: 0, minWidth: "100%" }}>
+            <FormHelperText>
+              <b>อายุของอ้อย(เดือน)</b>
+            </FormHelperText>
+            <Select
+              labelId="demo-simple-select-helper-label"
+              id="demo-simple-select-helper"
+              value={month}
+              onChange={(e) => setMonth(Number(e.target.value))}
+            >
+              {/* สร้างรายการตัวเลือกสำหรับตัวเลข 7 ถึง 12 */}
+              {[7, 8, 9, 10, 11, 12].map((number) => (
+                <MenuItem key={number} value={number} onClick={() => setMonth(number)}>
+                  {number}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <TextField
-            value={brixF}
-            onChange={(e) => setBrixF(e.target.value)}
+            value={brixFLast}
+            onChange={(e) => setBrixFLast(e.target.value)}
             label=""
             id="outlined-start-adornment"
             sx={{ mt: 1, width: "100%" }}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">Brix(F)</InputAdornment>
+                <InputAdornment position="start">Brix(F)-ปลายต้น</InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            value={brixFMiddle}
+            onChange={(e) => setBrixFMiddle(e.target.value)}
+            label=""
+            id="outlined-start-adornment"
+            sx={{ mt: 1, width: "100%" }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Brix(F)-กลางต้น</InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            value={brixFBegin}
+            onChange={(e) => setBrixFBegin(e.target.value)}
+            label=""
+            id="outlined-start-adornment"
+            sx={{ mt: 1, width: "100%" }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Brix(F)-โคนต้น</InputAdornment>
               ),
             }}
           />
 
+          {
+            brixFAvg ? (
+              <p>ค่าเฉลี่ย BrixF: {brixFAvg}</p>
+            ) : null
+          }
+
           <div className="flex flex-col justify-center items-center ">
-            <div className="my-2">{result ? "CCS is: " + result : "..."}</div>
+            <div className="my-2">{result ? "CCS predicted result: " + result : "..."}</div>
           </div>
-            <div className="flex w-full justify-center gap-2">
-              <Button
-                variant="primary"
-                onClick={predictData}
-                disabled={isLoading || [brixF, ModelName].some((value) => !value)}
-              >
-                {isLoading ? "Predicting..." : "PREDICT CCS"}
-              </Button>
-              <Button variant="secondary" onClick={clearValues}>
-                CLEAR
-              </Button>
-            </div>
+          <div className="flex w-full justify-center gap-2">
+            <Button
+              variant="primary"
+              onClick={predictData}
+              disabled={isLoading || [brixFLast, brixFMiddle, brixFBegin, ModelName, sumRain].some((value) => !value)}
+            >
+              {isLoading ? "Predicting..." : "PREDICT CCS"}
+            </Button>
+            <Button variant="secondary" onClick={clearValues}>
+              CLEAR
+            </Button>
+          </div>
         </div>
         <MapComponent lat={lat} lon={lon} />
       </div>
