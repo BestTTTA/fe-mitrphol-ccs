@@ -385,7 +385,7 @@ function Home() {
           }
 
           <div className="flex flex-col justify-center items-center ">
-            <div className="my-2">{result ? "CCS predicted result: " + result : "..."}</div>
+            <div className="my-2">{result ? "CCS result: " + result : "..."}</div>
           </div>
           <div className="flex w-full justify-center gap-2">
             <Button
