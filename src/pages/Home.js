@@ -35,8 +35,7 @@ function Home() {
   const getStartAndEndDate = () => {
     const today = new Date();
 
-    // Set start date to the first day of the current month
-    const startDate = new Date(today.getFullYear(), 0, 1); // เดือน 0 หมายถึงเดือนมกราคม
+    const startDate = new Date(today.getFullYear(), 0, 1); 
     const startDateString = startDate.toISOString().split("T")[0];
 
     // Set end date to two days before today
