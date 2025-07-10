@@ -40,7 +40,7 @@ function Home() {
 
     // Set end date to two days before today
     const endDate = new Date(today);
-    endDate.setDate(today.getDate() - 2);
+    endDate.setDate(today.getDate() - 3);
     const endDateString = endDate.toISOString().split("T")[0];
 
     // Extract and format the dates (without hyphens)
@@ -86,8 +86,9 @@ function Home() {
       let totalSum = 0;
       for (const date in precipitationData) {
         const value = precipitationData[date];
-        if (value >= 0 && value !== -999) {
-          totalSum += value;
+        const numValue = Number(value);
+        if (numValue !== -999 && numValue >= 0) {
+          totalSum += numValue;
         }
       }
       setSumRain(totalSum);
@@ -140,6 +141,7 @@ function Home() {
   // Automatically select T when sumRain changes
   useEffect(() => {
     const selectedT = selectTBasedOnRain(sumRain);
+    console.log(selectedT)
     setSelectedValue(selectedT);
   }, [sumRain]); // Trigger whenever sumRain changes
 
