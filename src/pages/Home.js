@@ -73,12 +73,6 @@ function Home() {
     getUserLocation();
   }
 
-  // useEffect(() => {
-  //   getStartAndEndDate();
-  //   getUserLocation();
-  // }, []);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchNasaPowerData = useCallback(async () => {
     const apiUrl = `https://power.larc.nasa.gov/api/temporal/daily/point?start=${startDate}&end=${endDate}&latitude=${lat}&longitude=${lon}&community=AG&parameters=PRECTOTCORR&format=JSON`;
 
@@ -92,7 +86,7 @@ function Home() {
       let totalSum = 0;
       for (const date in precipitationData) {
         const value = precipitationData[date];
-        if (value >= 0) {
+        if (value >= 0 && value !== -999) {
           totalSum += value;
         }
       }
