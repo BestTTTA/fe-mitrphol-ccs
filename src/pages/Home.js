@@ -91,7 +91,7 @@ function Home() {
           totalSum += numValue;
         }
       }
-      setSumRain(totalSum);
+      setSumRain(totalSum + 300);
     } catch (error) {
       console.error("Failed to fetch NASA POWER API data:", error);
     }
@@ -158,7 +158,7 @@ function Home() {
       case "Overall":
         return "finalized";
       case "มิตรภูเขียว":
-        return "M1";
+        return "finalized";
       case "มิตรกาฬสินธุ์":
         return "M2";
       case "มิตรภูเวียง":
@@ -200,7 +200,6 @@ function Home() {
 
   const thaiTimestamp = DateTime.now().setZone("Asia/Bangkok").toISO();
 
-  // month 7-12
   const sentLatLon = async (ccs) => {
     try {
       const data = {
